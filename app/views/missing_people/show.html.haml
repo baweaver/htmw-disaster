@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @missing_person.name
+%p
+  %b Contact name:
+  = @missing_person.contact_name
+%p
+  %b Contact number:
+  = @missing_person.contact_number
+%p
+  %b Description:
+  = @missing_person.description
+%p
+  %b Found:
+  = @missing_person.found
+
+= link_to 'Edit', edit_missing_person_path(@missing_person)
+\|
+= link_to 'Back', missing_people_path

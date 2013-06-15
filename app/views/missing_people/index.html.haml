@@ -1,0 +1,27 @@
+%h1 Listing missing_people
+
+%table
+  %tr
+    %th Name
+    %th Contact name
+    %th Contact number
+    %th Description
+    %th Found
+    %th
+    %th
+    %th
+
+  - @missing_people.each do |missing_person|
+    %tr
+      %td= missing_person.name
+      %td= missing_person.contact_name
+      %td= missing_person.contact_number
+      %td= missing_person.description
+      %td= missing_person.found
+      %td= link_to 'Show', missing_person
+      %td= link_to 'Edit', edit_missing_person_path(missing_person)
+      %td= link_to 'Destroy', missing_person, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Missing person', new_missing_person_path
