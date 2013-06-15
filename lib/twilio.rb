@@ -1,6 +1,6 @@
-ACCOUNT_SID = ''
-AUTH_TOKEN  = ''
-OUR_NUMBER  = ''
+ACCOUNT_SID = 'AC0a2ca9664ccb810dece8e55031b4db98'
+AUTH_TOKEN  = '2556e2e74acf97b82033febf170532fe'
+OUR_NUMBER  = '816-399-3325'
  
 client = Twilio::Rest::Client.new(ACCOUNT_SID, AUTH_TOKEN)
 
