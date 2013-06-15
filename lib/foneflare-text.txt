@@ -1,0 +1,51 @@
+ORIGINATOR Commands:
+HELP
+FLARE NEW
+FLARE CANCEL XXX
+FLARE CALL XXX
+
+RESPONDER Commands:
+RESP AVAIL [ZIP RADIUS]
+RESP QUIT
+RESP XXX
+RESP CALL XXX
+
+STOP
+----------------------------------------------
+
+FLARE NEW
+>A new flare has been created with ID F9807.
+>What is your zipcode?
+64086
+>What is your address?
+1234 Anystreet
+>What type of flare do you need to light? (1)Missing person (2)Medical Assistance (3)Stranded (4)Property Damage (5)Shelter
+3
+>Please describe your location and identifying characteristics:
+Car died at I-435 and State Ave Northbound
+>A stranded flare has been lit with F9807. When someone responds, we'll let you know. Reply with FLARE CANCEL F9807 when assistance is no longer needed.
+
+----------------------------------------------
+
+RESP AVAIL
+>What is your zip code?
+64086
+>How many miles are you willing to travel from 64086 to respond to flares?
+10
+>A new responder ID has been created for you with ID R5678. We'll let you know if any new flares are lit within 10 miles of 64086.
+
+----------------------------------------------
+
+RESP QUIT
+>No flares will be sent to you until you return by typing RESP NEW again.
+
+----------------------------------------------
+
+>A stranded person at 1234 Anystreet was reported in 64086. Reply with RESP F1234 to respond to this flare.
+RESP F1234
+>You are responding to flare F1234. The originator is being notified. You will receive no new flare notifications. Reply with RESP CALL F1234 to call the originator now, or RESP AVAIL when the flare is extinguished.
+
+----------------------------------------------
+
+>Respondent R9087 is responding to your "stranded" flare. Reply with FLARE CALL R9087 to call this respondent, or FLARE CALL F1234 to conference call all responders.
+
