@@ -1,4 +1,18 @@
 HtmwDisaster::Application.routes.draw do
+  get "flare/index"
+
+  get "flare/new"
+
+  get "flare/create"
+
+  get "flare/destroy"
+
+  get "flare/call"
+
+  get "flare/cancel"
+
+  get "flare/respond"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
