@@ -1,7 +1,4 @@
 HtmwDisaster::Application.routes.draw do
-  resources :missing_people
-
-
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
