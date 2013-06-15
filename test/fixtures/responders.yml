@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  srcphone: MyString
+  zip: MyString
+  lat: 1.5
+  long: 1.5
+  radius: 1.5
+  active: MyString
+
+two:
+  srcphone: MyString
+  zip: MyString
+  lat: 1.5
+  long: 1.5
+  radius: 1.5
+  active: MyString

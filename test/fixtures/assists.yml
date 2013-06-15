@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  flare_id: 1
+  responder_id: 1
+  active: false
+
+two:
+  flare_id: 1
+  responder_id: 1
+  active: false
