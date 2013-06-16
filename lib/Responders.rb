@@ -9,25 +9,28 @@ def dbCon
 	
 def initailize
 	db = dbCon
-	db.execute('INSERT into RESPONDERS values (null,"null","null","null", "null","0","null","null")')
+	db.execute('INSERT into RESPONDERS values (null,"null","null","null", "null","2","null","null")')
 	db.close
 end
 	
 def updatePhone(srcPhone="null")
 	db = dbCon
-	db.execute('INSERT into RESPONDERS values (null,' + srcPhone + ',"null","null","null","0","null","null")')
+	db.execute('INSERT into RESPONDERS values (null,' + srcPhone + ',"null","null","null","2","null","null")')
 	db.close
 	end
 
 def updateZip(srcPhone="null", zip="null")
 	db = dbCon
 	db.execute('update RESPONDERS set ZIP=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM RESPONDERS WHERE SRCPHONE='+ srcPhone +')', zip)
+	db.execute('update RESPONDERS set ACTIVE=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM RESPONDERS WHERE SRCPHONE='+ srcPhone +')', 3)
 	db.close
 end
 
 def updateRadius(srcPhone="null", loc="null")
 	db = dbCon
 	db.execute('update RESPONDERS set RADIUS=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM RESPONDERS WHERE SRCPHONE='+ srcPhone +')', loc)
+	db.execute('update RESPONDERS set ACTIVE=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM RESPONDERS WHERE SRCPHONE='+ srcPhone +')', 4)
+	
 	db.close
 end
 

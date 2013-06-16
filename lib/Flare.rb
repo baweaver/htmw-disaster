@@ -9,31 +9,34 @@ def dbCon
 	
 def initailize
 	db = dbCon
-	db.execute('INSERT into FLARES values (null,"null","null","null", "null","null","0","null","null")')
+	db.execute('INSERT into FLARES values (null,"null","null","null", "null","null","2","null","null")')
 	db.close
 end
 	
 def updatePhone(srcPhone="null")
 	db = dbCon
-	db.execute('INSERT into FLARES values (null,' + srcPhone + ',"null","null", "null","null","0","null","null")')
+	db.execute('INSERT into FLARES values (null,' + srcPhone + ',"null","null", "null","null","2","null","null")')
 	db.close
 	end
 
 def updateZip(srcPhone="null", zip="null")
 	db = dbCon
 	db.execute('update FLARES set ZIP=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM FLARES WHERE SRCPHONE='+ srcPhone +')', zip)
+	db.execute('update FLARES set ACTIVE=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM FLARES WHERE SRCPHONE='+ srcPhone +')', 3)
 	db.close
 end
 
 def updateLocation(srcPhone="null", loc="null")
 	db = dbCon
 	db.execute('update FLARES set LOCATION=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM FLARES WHERE SRCPHONE='+ srcPhone +')', loc)
+	db.execute('update FLARES set ACTIVE=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM FLARES WHERE SRCPHONE='+ srcPhone +')', 4)
 	db.close
 end
 
 def updateCategory(srcPhone="null", category="null")
 	db = dbCon
 	db.execute('update FLARES set CATEGORY=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM FLARES WHERE SRCPHONE='+ srcPhone +')', category)
+	db.execute('update FLARES set ACTIVE=? WHERE FLARE_ID=(SELECT MAX(FLARE_ID) FROM FLARES WHERE SRCPHONE='+ srcPhone +')', 5)
 	db.close
 end
 
