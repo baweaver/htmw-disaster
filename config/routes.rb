@@ -1,4 +1,6 @@
 HtmwDisaster::Application.routes.draw do
+  get "flare/list"
+
   get "categories/read"
 
   get "flare/index"

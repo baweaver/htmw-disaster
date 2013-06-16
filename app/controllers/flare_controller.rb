@@ -33,4 +33,9 @@ class FlareController < ApplicationController
 
   def respond
   end
+
+  def list
+    db = SQLite3::Database.open "db/development.sqlite3"
+    @flares = db.execute("SELECT * FROM FLARES LEFT OUTER JOIN CATEGORIES ON CATEGORIES.CATEGORY_ID = FLARES.CATEGORY;")
+  end
 end
