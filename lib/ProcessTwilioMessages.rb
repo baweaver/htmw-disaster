@@ -53,9 +53,9 @@ if rs.count > 0
 		md=/^flare new$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			@db.execute "insert into FLARES (srcphone, active, create_dt) values ('"+srcphone+"',2,'"+Time.now.to_s()+"')"
+			@db.execute "insert into FLARES (srcphone, active, created_dt) values ('"+srcphone+"',2,'"+Time.now.to_s()+"')"
 			fid=@db.get_first_value("select flare_id from FLARES where srcphone='"+srcphone+"' and active=2")
-			@client.account.sms.messages.create(:body=>"You have created a new flare id F"+fid+". Please record this flare id for future commands to FoneFlare.", :to=>srcphone, :from=>twiliophone)			
+			@client.account.sms.messages.create(:body=>"You have created a new flare id F"+fid.to_s()+". Please record this flare id for future commands to FoneFlare.", :to=>srcphone, :from=>twiliophone)			
 			@client.account.sms.messages.create(:body=>"What is the zip code of your flare?", :to=>srcphone, :from=>twiliophone)
 			messagepending=false
 		end
@@ -90,6 +90,10 @@ if rs.count > 0
 		md=/^resp avail$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
+			@db.execute "insert into RESPONDERS (srcphone, active, created_dt) values ('"+srcphone+"',2,'"+Time.now.to_s()+"')"
+			rid=@db.get_first_value("select responder_id from RESPONDERS where srcphone='"+srcphone+"' and active=2")
+			@client.account.sms.messages.create(:body=>"You have created a new responder id R"+fid.to_s()+". Please record this responder id for future commands to FoneFlare.", :to=>srcphone, :from=>twiliophone)			
+			@client.account.sms.messages.create(:body=>"What is the zip code you can respond to?", :to=>srcphone, :from=>twiliophone)
 			messagepending=false
 		end
 
@@ -145,7 +149,9 @@ if rs.count > 0
 						@client.account.sms.messages.create(:body=>"Please enter a valid category number.", :to=>srcphone, :from=>twiliophone)
 					end
 				when "5"
+					fid=@db.get_first_value("select flare_id from FLARES where srcphone='"+srcphone+"' and active=4")
 					@db.execute("update FLARES set description='"+message.body+"', active=1 where srcphone='"+srcphone+"' and active=5")
+					@client.account.sms.messages.create(:body=>"You have completed creating flare id "+fid.to_s()+". Please record this responder id for future commands to FoneFlare." , :to=>srcphone, :from=>twiliophone)
 				else
 					disableFlareAndResponderBuild srcphone
 					@client.account.sms.messages.create(:body=>"There was an error creating your flare.  Please reply with FLARE NEW to start over.", :to=>srcphone, :from=>twiliophone)
@@ -156,16 +162,26 @@ if rs.count > 0
 			if rs!=nil
 				case rs.to_s()
 					when "2"
-					rid=@db.get_first_value("select RESPONDER_ID from RESPONDERS where SRCPHONE='" + srcphone + "' and ACTIVE=2")
-					@client.account.sms.messages.create(:body=>"You have created a new RESPONDER ID=R"+fid.to_s(), :to=>srcphone, :from=>twiliophone)
-					@client.account.sms.messages.create(:body=>"What is the zip code you can respond to?", :to=>srcphone, :from=>twiliophone)
+						@db.execute("update RESPONDERS set zip='"+message.body+"', active=3 where srcphone='"+srcphone+"' and active=2")
+						@client.account.sms.messages.create(:body=>"What is the radius in miles you can respond to?", :to=>srcphone, :from=>twiliophone)
 					when "3"
-					@client.account.sms.messages.create(:body=>"What is the radius in miles you can respond to?", :to=>srcphone, :from=>twiliophone)
+						if message.body.to_i().to_s()==message.body
+							@db.execute("update RESPONDERS set radius="+message.body+", active=4 where srcphone='"+srcphone+"' and active=3")
+							@client.account.sms.messages.create(:body=>"What is the category you can respond to?", :to=>srcphone, :from=>twiliophone)
+						else
+							@client.account.sms.messages.create(:body=>"Please enter a whole number for miles.", :to=>srcphone, :from=>twiliophone)
+						end
 					when "4"
-					@client.account.sms.messages.create(:body=>"What is the category you can respond to?", :to=>srcphone, :from=>twiliophone)
+						if message.body.to_i().to_s()==message.body
+							rid=@db.get_first_value("select responder_id from RESPONDERS where srcphone='"+srcphone+"' and active=4")
+							@db.execute("update RESPONDERS set category="+message.body+", active=1 where srcphone='"+srcphone+"' and active=4")
+							@client.account.sms.messages.create(:body=>"You have completed creating responder id R"+rid.to_s()+". Please record this responder id for future commands to FoneFlare." , :to=>srcphone, :from=>twiliophone)
+						else
+							@client.account.sms.messages.create(:body=>"Please enter a valid category number.", :to=>srcphone, :from=>twiliophone)
+						end
 				else
 					disableFlareAndResponderBuild srcphone
-					@client.account.sms.messages.create(:body=>"There was an error creating your flare.  Please reply with FLARE NEW to start over.", :to=>srcphone, :from=>twiliophone)
+					@client.account.sms.messages.create(:body=>"There was an error creating your responder.  Please reply with RESP AVAIL to start over.", :to=>srcphone, :from=>twiliophone)
 				end
 				messagepending=false
 			end
@@ -183,6 +199,19 @@ if rs.count > 0
 	end
 end
 
+puts "FLARES TABLE"
+rs=@db.execute("select * from FLARES")
+rs.each do |row|
+	puts row.join "\s"
+end
+puts ""
+puts "RESPONDERS TABLE"
+rs=@db.execute("select * from RESPONDERS")
+rs.each do |row|
+	puts row.join "\s"
+end
+puts ""
+
 #process outbound messages
 sql="
 	select	a.flare_id,
@@ -197,8 +226,9 @@ sql="
 	from 	FLARES as a
 			inner join RESPONDERS as b
 				on b.zip=a.zip
-					and (b.category=a.category or b.category=0)
-					and '"+(Time.now-15*60*60).to_s()+"'>(select max(created_dt) from COMMUNICATIONS as e where e.responder_id=b.responder_id)
+					and b.category=a.category
+					and ('"+(Time.now-15*60*60).to_s()+"'>(select max(created_dt) from COMMUNICATIONS as e where e.responder_id=b.responder_id)
+						or not exists (select * from COMMUNICATIONS as f where f.responder_id=b.responder_id))
 					and b.active=1
 			inner join CATEGORIES as c
 				on c.category_id=a.category
@@ -209,16 +239,26 @@ sql="
 	"
 rs=@db.execute sql
 resp_srcphone=""
+puts "RESPONSE MATCHES"
 rs.each do |row|
-	if rs["responder_srcphone"]!=resp_srcphone
+	puts row.join "\s"
+	if row[8]!=resp_srcphone
 		resp_count=0
-		resp_srcphone=rs["responder_srcphone"]
+		resp_srcphone=row[8]
 	end
 	
 	if resp_count<5
-		@client.account.sms.messages.create("A "+rs["Category"].to_s()+" flare has been sent in your area. FlareID="+rs["flare_id"].to_s()+".")
-		@client.account.sms.messages.create(rs["flare_description"])
-		db.execute "insert into COMMUNICATIONS (flare_id, responder_id, created_dt) values ("+rs["flare_id"].to_s()+","+rs["responder_id"].to_s(),Time.now.to_s()+")"
+		@client.account.sms.messages.create(:body=>"A "+row[2]+" flare has been created in your area. FlareID=F"+row[0].to_s()+".", :to=>row[8], :from=>twiliophone)
+		@client.account.sms.messages.create(:body=>row[5], :to=>row[8], :from=>twiliophone)
+		@db.execute "insert into COMMUNICATIONS (flare_id, responder_id, created_dt) values ("+row[0].to_s()+","+row[7].to_s()+",'"+Time.now.to_s()+"')"
 		resp_count=resp_count+1
 	end
 end
+puts ""
+
+puts "COMMUNICATIONS TABLE"
+rs=@db.execute "select * from COMMUNICATIONS"
+rs.each do |row|
+	puts row.join "\s"
+end
+puts ""
