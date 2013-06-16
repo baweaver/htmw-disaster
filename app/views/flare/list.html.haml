@@ -9,7 +9,7 @@
     %meta{:content => "", :name => "description"}/
     %meta{:content => "", :name => "author"}/
     / Le styles
-    %link{:href => "../css/bootstrap.css", :rel => "stylesheet"}/
+    %link{:href => "/assets/bootstrap.css", :rel => "stylesheet"}/
     :css
       body {
         padding-top: 60px;
@@ -30,7 +30,7 @@
       / Main hero unit for a primary marketing message or call to action
       .hero-unit
         %img{:src => "/assets/FoneFlareBanner.png"}/
-      %legend Current flares in zip code: xxxxx
+      %legend Current flares in zip code: #{@results}
       %table.table.table-striped
         %thead
           %tr
@@ -71,19 +71,19 @@
       Le javascript
       \==================================================
     / Placed at the end of the document so the pages load faster
-    %script{:src => "../js/jquery.js"}
-    %script{:src => "../js/bootstrap-transition.js"}
-    %script{:src => "../js/bootstrap-alert.js"}
-    %script{:src => "../js/bootstrap-modal.js"}
-    %script{:src => "../js/bootstrap-dropdown.js"}
-    %script{:src => "../js/bootstrap-scrollspy.js"}
-    %script{:src => "../js/bootstrap-tab.js"}
-    %script{:src => "../js/bootstrap-tooltip.js"}
-    %script{:src => "../js/bootstrap-popover.js"}
-    %script{:src => "../js/bootstrap-button.js"}
-    %script{:src => "../js/bootstrap-collapse.js"}
-    %script{:src => "../js/bootstrap-carousel.js"}
-    %script{:src => "../js/bootstrap-typeahead.js"}
+    %script{:src => "/assets/jquery.js"}
+    %script{:src => "/assets/bootstrap-transition.js"}
+    %script{:src => "/assets/bootstrap-alert.js"}
+    %script{:src => "/assets/bootstrap-modal.js"}
+    %script{:src => "/assets/bootstrap-dropdown.js"}
+    %script{:src => "/assets/bootstrap-scrollspy.js"}
+    %script{:src => "/assets/bootstrap-tab.js"}
+    %script{:src => "/assets/bootstrap-tooltip.js"}
+    %script{:src => "/assets/bootstrap-popover.js"}
+    %script{:src => "/assets/bootstrap-button.js"}
+    %script{:src => "/assets/bootstrap-collapse.js"}
+    %script{:src => "/assets/bootstrap-carousel.js"}
+    %script{:src => "/assets/bootstrap-typeahead.js"}
     %script#hiddenlpsubmitdiv{:style => "display: none;"}
     :javascript
       try{for(var lastpass_iter=0; lastpass_iter < document.forms.length; lastpass_iter++){ var lastpass_f = document.forms[lastpass_iter]; if(typeof(lastpass_f.lpsubmitorig2)=="undefined"){ lastpass_f.lpsubmitorig2 = lastpass_f.submit; lastpass_f.submit = function(){ var form=this; var customEvent = document.createEvent("Event"); customEvent.initEvent("lpCustomEvent", true, true); var d = document.getElementById("hiddenlpsubmitdiv"); for(var i = 0; i < document.forms.length; i++){ if(document.forms[i]==form){ d.innerText=i; } } d.dispatchEvent(customEvent); form.lpsubmitorig2(); } } }}catch(e){}
