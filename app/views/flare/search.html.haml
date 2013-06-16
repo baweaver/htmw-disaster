@@ -29,14 +29,14 @@
     .container
       / Main hero unit for a primary marketing message or call to action
       .hero-unit
-        %img{:src => "../../FoneFlare.png"}/
-      %form.form-horizontal{:action => "list", :method => "get"}
+        %img{:src => "/assets/FoneFlareBanner.png"}/
+      %form.form-horizontal{:action => "list", :method => "get", :name => "flare_search"}
         %fieldset
           %legend See who needs help in your area
           .control-group
-            %label.control-label{:for => :zipCode} Enter your zip code
+            %label.control-label{:for => :zipcode} Enter your zip code
             .controls
-              %input#input01.input-xlarge{:type => "text"}/
+              %input#input01.input-xlarge{:type => "text", :name => :zipcode}/
           .form-actions
             %button.btn.btn-primary{:type => "submit"} Find active flares
             %button.btn Cancel

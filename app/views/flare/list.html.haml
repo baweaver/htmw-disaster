@@ -29,7 +29,7 @@
     .container
       / Main hero unit for a primary marketing message or call to action
       .hero-unit
-        %img{:src => "../../FoneFlare.png"}/
+        %img{:src => "/assets/FoneFlareBanner.png"}/
       %legend Current flares in zip code: xxxxx
       %table.table.table-striped
         %thead
@@ -65,7 +65,7 @@
               %td #{row[2]}
               %td #{row[3]}
       %footer
-        %p  
+        %p=@results
     / /container
     /
       Le javascript
