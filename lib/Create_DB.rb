@@ -1,12 +1,12 @@
 require 'sqlite3'
 
-dbver="1.0.4"
+dbver="1.0.7"
 db = SQLite3::Database.open "../db/development.sqlite3"
 
 if "FONEFLARE"!=db.get_first_value("SELECT name FROM sqlite_master WHERE type='table' AND name='FONEFLARE'");
 	db.execute "create table if not exists FONEFLARE (DBVERSION TEXT,
 														LASTSMSQUERY TEXT)"
-	db.execute "insert into FONEFLARE (DBVERSION, LASTSMSQUERY) values ('" + dbver + "','1900-01-01 00:00:00')"
+	db.execute "insert into FONEFLARE (DBVERSION, LASTSMSQUERY) values ('" + dbver + "','"+Time.now.to_s()+"')"
 	dbcurver=""
 else
 	dbcurver=db.get_first_value "select max(DBVERSION) from FONEFLARE limit 1"
@@ -17,14 +17,16 @@ if (dbcurver!=dbver)
 	puts "Dropping all tables and recreating."
 
 	db.execute "delete from FONEFLARE"
-	db.execute "insert into FONEFLARE (DBVERSION, LASTSMSQUERY) values ('" + dbver + "','1900-01-01 00:00:00 +0000')"
+	db.execute "insert into FONEFLARE (DBVERSION, LASTSMSQUERY) values ('" + dbver + "','"+Time.now.to_s()+"')"
 	
 	db.execute "drop table if exists FLARES"
 	db.execute "drop table if exists CATEGORIES"
 	db.execute "drop table if exists RESPONDERS"
 	db.execute "drop table if exists ASSISTS"
 	db.execute "drop table if exists COMMUNICATIONS"
-		
+	db.execute "drop table if exists SUBSCRIPTIONS"
+	db.execute "drop table if exists SUBSCRIPTIONCOMMUNICATIONS"
+	
 	puts "Current database version is " + dbver
 
 	puts "Create FLARES table"
@@ -76,4 +78,17 @@ if (dbcurver!=dbver)
 																CREATED_DT TEXT)"
 															
 
+	puts "Create SUBSCRIPTIONS table"
+	db.execute "create table if not exists SUBSCRIPTIONS	(SUBSCRIPTION_ID INTEGER PRIMARY KEY,
+															SRCPHONE TEXT, 
+															SUBPHONE TEXT,
+															APPROVED INTEGER,
+															CREATED_DT TEXT,
+															UPDATED_DT TEXT)"
+	
+	puts "Create SUBSCRIPTIONCOMMUNICATIONS table"
+	db.execute "create table if not exists SUBSCRIPTIONCOMMUNICATIONS	(SUBSCRIPTIONCOMMUNICATION_ID INTEGER PRIMARY KEY,
+																		FLARE_ID INTEGER,
+																		SRCPHONE TEXT,
+																		CREATED_DT TEXT)"
 end
