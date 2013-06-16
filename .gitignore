@@ -13,3 +13,15 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
+
+app/.DS_Store
+
+app/assets/.DS_Store
+
+.gitignore
+
+.gitignore
+
+public/index.html
+
+public/index.html

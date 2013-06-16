@@ -1,6 +1,6 @@
 require 'sqlite3'
 
-dbver="1.0.3"
+dbver="1.0.4"
 db = SQLite3::Database.open "../db/development.sqlite3"
 
 if "FONEFLARE"!=db.get_first_value("SELECT name FROM sqlite_master WHERE type='table' AND name='FONEFLARE'");
@@ -17,7 +17,7 @@ if (dbcurver!=dbver)
 	puts "Dropping all tables and recreating."
 
 	db.execute "delete from FONEFLARE"
-	db.execute "insert into FONEFLARE (DBVERSION, LASTSMSQUERY) values ('" + dbver + "','1900-01-01 00:00:00')"
+	db.execute "insert into FONEFLARE (DBVERSION, LASTSMSQUERY) values ('" + dbver + "','1900-01-01 00:00:00 +0000')"
 	
 	db.execute "drop table if exists FLARES"
 	db.execute "drop table if exists CATEGORIES"
