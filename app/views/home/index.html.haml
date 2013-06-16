@@ -1,0 +1,75 @@
+!!!
+/ saved from url=(0053)http://twitter.github.io/bootstrap/examples/hero.html
+%html{:lang => "en"}
+  %head
+    %meta{:content => "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+    %meta{:charset => "utf-8"}/
+    %title FoneFlare - ask for help or fill a need
+    %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}/
+    %meta{:content => "", :name => "description"}/
+    %meta{:content => "", :name => "author"}/
+    / Le styles
+    %link{:href => "../css/bootstrap.css", :rel => "stylesheet"}/
+    :css
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+        %link{:href => "http://twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css", :rel => "stylesheet"}/
+    / HTML5 shim, for IE6-8 support of HTML5 elements
+    /[if lt IE 9]
+      <script src="../assets/js/html5shiv.js"></script>
+    / Fav and touch icons
+    %link{:href => "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-144-precomposed.png", :rel => "apple-touch-icon-precomposed", :sizes => "144x144"}/
+    %link{:href => "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-114-precomposed.png", :rel => "apple-touch-icon-precomposed", :sizes => "114x114"}/
+    %link{:href => "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-72-precomposed.png", :rel => "apple-touch-icon-precomposed", :sizes => "72x72"}/
+    %link{:href => "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png", :rel => "apple-touch-icon-precomposed"}/
+    %link{:href => "http://twitter.github.io/bootstrap/assets/ico/favicon.png", :rel => "shortcut icon"}/
+  %body
+    .container
+      / Main hero unit for a primary marketing message or call to action
+      .hero-unit
+        %img{:src => "../../FoneFlare.png"}/
+        %p  
+        %p
+          %strong FoneFlare helps you get the word out
+          when you need assistance, or be "on-call" when you can help others. Even if Internet access is hard to come by after a natural disaster, or in a remote coverage area, use SMS to request help from responders in your zip code, or find out who could use your assistance.
+        %p
+          %a.btn.btn-primary.btn-large{:href => "flare/create"}> Create a flare »
+          \  
+          %a.btn.btn-primary.btn-large{:href => "search_flares.htm"} See who needs help »
+      / Example row of columns
+      .row
+        .span4
+          %h2 Simple to use
+          %p No complicated connections or web sites. Just use your phone's text messaging capability to send up a  "flare" when you need help.
+        .span4
+          %h2 Resilient
+          %p There's a good chance you won't be able to get a reliable data connection after a natural disaster strikes. FoneFlare uses SMS (text) messaging when there's no data connections, so you can still communicate.
+        .span4
+          %h2 Anonymous
+          %p Respondents won't ever see your actual phone number; everything is managed anonymously by the FoneFlare app.
+      %hr/
+      %footer
+        %p  
+    / /container
+    /
+      Le javascript
+      \==================================================
+    / Placed at the end of the document so the pages load faster
+    %script{:src => "../js/jquery.js"}
+    %script{:src => "../js/bootstrap-transition.js"}
+    %script{:src => "../js/bootstrap-alert.js"}
+    %script{:src => "../js/bootstrap-modal.js"}
+    %script{:src => "../js/bootstrap-dropdown.js"}
+    %script{:src => "../js/bootstrap-scrollspy.js"}
+    %script{:src => "../js/bootstrap-tab.js"}
+    %script{:src => "../js/bootstrap-tooltip.js"}
+    %script{:src => "../js/bootstrap-popover.js"}
+    %script{:src => "../js/bootstrap-button.js"}
+    %script{:src => "../js/bootstrap-collapse.js"}
+    %script{:src => "../js/bootstrap-carousel.js"}
+    %script{:src => "../js/bootstrap-typeahead.js"}
+    %script#hiddenlpsubmitdiv{:style => "display: none;"}
+    :javascript
+      try{for(var lastpass_iter=0; lastpass_iter < document.forms.length; lastpass_iter++){ var lastpass_f = document.forms[lastpass_iter]; if(typeof(lastpass_f.lpsubmitorig2)=="undefined"){ lastpass_f.lpsubmitorig2 = lastpass_f.submit; lastpass_f.submit = function(){ var form=this; var customEvent = document.createEvent("Event"); customEvent.initEvent("lpCustomEvent", true, true); var d = document.getElementById("hiddenlpsubmitdiv"); for(var i = 0; i < document.forms.length; i++){ if(document.forms[i]==form){ d.innerText=i; } } d.dispatchEvent(customEvent); form.lpsubmitorig2(); } } }}catch(e){}
