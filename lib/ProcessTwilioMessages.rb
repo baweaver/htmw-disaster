@@ -17,18 +17,19 @@ twiliophone="8165459240"
 @db = SQLite3::Database.open "../db/development.sqlite3"
 
 #process inbound messages
-@db.execute("update FONEFLARE set LASTSMSQUERY='2013-06-15 22:58:46 -0500'")
+#@db.execute("update FONEFLARE set LASTSMSQUERY='2013-06-15 22:58:46 -0500'")
 lastsmsquery=@db.get_first_value("select max(LASTSMSQUERY) from FONEFLARE limit 1")
 rs=@client.account.sms.messages.list(:date_sent=>lastsmsquery)
 
-if rs.count > 0
-	rs.select! {|x| x.direction=="inbound"}
-	rs.reject! {|x| Time.parse(x.date_sent).to_s()==lastsmsquery}
-	rs.sort! {|x,y| x.date_sent<=>y.date_sent}
+rs.select! {|x| x.direction=="inbound"}
+rs.reject! {|x| Time.parse(x.date_sent).to_s()==lastsmsquery}
 
+if rs.count > 0
 	lastsmsdate=Time.parse(rs[0].date_sent).to_s()
 	@db.execute("update FONEFLARE set LASTSMSQUERY='"+lastsmsdate+"'")
 		
+	rs.sort! {|x,y| x.date_sent<=>y.date_sent}
+
 	rs.each do |message|		
 		def disableFlareAndResponderBuild(srcphone="")
 			@db.execute "update FLARES set ACTIVE=0 where SRCPHONE='" + srcphone + "' and ACTIVE>=2"
@@ -38,63 +39,91 @@ if rs.count > 0
 		messagepending=true
 		srcphone=message.from
 		
-		puts srcphone + " " + Time.parse(message.date_sent).to_s()
+		puts srcphone + " " + Time.parse(message.date_sent).to_s() + " " + message.body
 		
-		md=/^stop$/i.match(message.body)
+		md=/^stopff$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Stop"
+			@db.execute "update FLARES set active=0 where srcphone='"+srcphone+"'"
+			@db.execute "update RESPONDERS set active=0 where srcphone='"+srcphone+"'"
+			@client.account.sms.messages.create(:body=>"Thank you for using FoneFlare.  All your flares and responders have been canceled.  You will not receive any new messages until you reactivate.", :to=>srcphone, :from=>twiliophone)			
 			messagepending=false
 		end
 		
 		md=/^flare new$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Flare New"
-			#@client.account.calls.create(:to=>"8166944335", :from=>twiliophone, :application_sid=>application_sid)
+			@db.execute "insert into FLARES (srcphone, active, create_dt) values ('"+srcphone+"',2,'"+Time.now.to_s()+"')"
+			fid=@db.get_first_value("select flare_id from FLARES where srcphone='"+srcphone+"' and active=2")
+			@client.account.sms.messages.create(:body=>"You have created a new flare id F"+fid+". Please record this flare id for future commands to FoneFlare.", :to=>srcphone, :from=>twiliophone)			
+			@client.account.sms.messages.create(:body=>"What is the zip code of your flare?", :to=>srcphone, :from=>twiliophone)
 			messagepending=false
 		end
 		
 		md=/^flare cancel f[0-9]+$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Flare cancel"
+			fid=/f[0-9]+$/i.match(message.body).to_s()[1..-1]
+			ok=@db.get_first_value("select count(*) from FLARES where flare_id="+fid+" and srcphone='"+srcphone+"'")
+			if ok>0
+				@db.execute "update FLARES set active=0 where flare_id="+fid+" and srcphone='"+srcphone+"'"
+				@client.account.sms.messages.create(:body=>"You have cancelled flare id "+fid.to_s+".", :to=>srcphone, :from=>twiliophone)			
+			else
+				@client.account.sms.messages.create(:body=>"Invalid flare id "+fid.to_s+".", :to=>srcphone, :from=>twiliophone)			
+			end
 			messagepending=false
 		end
 		
 		md=/^flare call f[0-9]+$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Flare conference call"
+			fid=/f[0-9]+$/i.match(message.body).to_s()[1..-1]
+			ok=@db.get_first_value("select count(*) from FLARES where flare_id="+fid+" and srcphone='"+srcphone+"'")
+			if ok>0
+				#make conference call
+			else
+				@client.account.sms.messages.create(:body=>"Invalid flare id "+fid.to_s+".", :to=>srcphone, :from=>twiliophone)			
+			end
 			messagepending=false
 		end
 
 		md=/^resp avail$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Responder available"
 			messagepending=false
 		end
 
 		md=/^resp quit$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Responder quit"
+			db.execute "update RESPONDERS set active=0 where srcphone='"+srcphone+"'"
 			messagepending=false
 		end
 		
 		md=/^resp f[0-9]+$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Responder respond"
+			fid=/f[0-9]+$/i.match(message.body).to_s()[1..-1]
+			ok=@db.get_first_value("select count(*) from FLARES where flare_id="+fid+" and responder_id=(select responderid from RESPONDERS where srcphone='"+srcphone+"' and category=(select category from FLARES where flare_id="+fid+")")
+			if ok>0
+				db.execute "insert into ASSISTS (flare_id, responder_id, created_dt) values ('"+fid+"',select responder_id from RESPONDERS where srcphone='"+srcphone+"' and category=(select category from FLARES where flare_id="+fid+"),'"+Tiime.now.to_s()+"')"
+				db.execute "update RESPONDERS set active=0 where srcphone='"+srcphone+"'"
+				@client.account.sms.messages.create(:body=>"You have responded to flare id "+fid.to_s+". You will not be active for any more flares until you notify FoneFlare that you are available.", :to=>srcphone, :from=>twiliophone)			
+			else
+				@client.account.sms.messages.create(:body=>"Invalid flare id "+fid.to_s+".", :to=>srcphone, :from=>twiliophone)			
+			end
 			messagepending=false
 		end
 		
 		md=/^resp call f[0-9]+$/i.match(message.body)
 		if messagepending and md!=nil
 			disableFlareAndResponderBuild srcphone
-			puts "Responder call"
-			
+			ok=@db.get_first_value("select count(*) from FLARES where flare_id="+fid+" and responder_id=(select responderid from RESPONDERS where srcphone='"+srcphone+"' and category=(select category from FLARES where flare_id="+fid+")")
+			if ok>0
+				#make conference call
+			else
+				@client.account.sms.messages.create(:body=>"Invalid flare id "+fid.to_s+".", :to=>srcphone, :from=>twiliophone)			
+			end
 			messagepending=false
 		end
 		
@@ -103,15 +132,20 @@ if rs.count > 0
 			if fs!=nil
 				case fs.to_s()
 				when "2"
-					fid=@db.get_first_value("select FLARE_ID from FLARES where SRCPHONE='" + srcphone + "' and ACTIVE=2")
-					@client.account.sms.messages.create(:body=>"You have created a new FLARE ID=F"+fid.to_s(), :to=>srcphone, :from=>twiliophone)
-					@client.account.sms.messages.create(:body=>"What is the zip code of your flare?", :to=>srcphone, :from=>twiliophone)
-				when "3"
+					@db.execute("update FLARES set zip='"+message.body+"', active=3 where srcphone='"+srcphone+"' and active=2")
 					@client.account.sms.messages.create(:body=>"What is the address or location code of your flare?", :to=>srcphone, :from=>twiliophone)
-				when "4"
+				when "3"
+					@db.execute("update FLARES set location='"+message.body+"', active=4 where srcphone='"+srcphone+"' and active=3")
 					@client.account.sms.messages.create(:body=>"What is the nature or category of your flare?", :to=>srcphone, :from=>twiliophone)
+				when "4"
+					if message.body.to_i().to_s()==message.body
+						@db.execute("update FLARES set category='"+message.body+"', active=5 where srcphone='"+srcphone+"' and active=4")
+						@client.account.sms.messages.create(:body=>"Please enter a brief description of your flare.", :to=>srcphone, :from=>twiliophone)
+					else
+						@client.account.sms.messages.create(:body=>"Please enter a valid category number.", :to=>srcphone, :from=>twiliophone)
+					end
 				when "5"
-					@client.account.sms.messages.create(:body=>"Please enter a brief description of your flare.", :to=>srcphone, :from=>twiliophone)
+					@db.execute("update FLARES set description='"+message.body+"', active=1 where srcphone='"+srcphone+"' and active=5")
 				else
 					disableFlareAndResponderBuild srcphone
 					@client.account.sms.messages.create(:body=>"There was an error creating your flare.  Please reply with FLARE NEW to start over.", :to=>srcphone, :from=>twiliophone)
@@ -137,7 +171,7 @@ if rs.count > 0
 			end
 		end
 
-		if messagepending and false 
+		if messagepending and false
 			body="ORIGINATOR: HELP,FLARE NEW,FLARE CANCEL [FID],FLARE CALL [FID]\nRESPONDER: RESP AVAIL [ZIP RADIUS],RESP QUIT,RESP [FID},RESP CALL [FID]"
 			@client.account.sms.messages.create(:body=>body, :to=>srcphone, :from=>twiliophone)
 			
