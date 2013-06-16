@@ -2,6 +2,7 @@ HtmwDisaster::Application.routes.draw do
   get "home/index"
 
   get "flare/list"
+  post "flare/list"
 
   get "categories/read"
 
@@ -18,6 +19,8 @@ HtmwDisaster::Application.routes.draw do
   get "flare/cancel"
 
   get "flare/respond"
+
+  get "flare/search"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

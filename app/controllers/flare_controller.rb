@@ -38,4 +38,8 @@ class FlareController < ApplicationController
     db = SQLite3::Database.open "db/development.sqlite3"
     @flares = db.execute("SELECT FLARES.FLARE_ID, FLARES.DESCRIPTION, FLARES.LOCATION, CATEGORIES.DESCRIPTION FROM FLARES INNER JOIN CATEGORIES ON CATEGORIES.CATEGORY_ID = FLARES.CATEGORY WHERE FLARES.ACTIVE=1;")
   end
+
+  def search
+
+  end
 end
