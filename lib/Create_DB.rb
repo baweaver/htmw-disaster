@@ -1,6 +1,6 @@
 require 'sqlite3'
 
-dbver="1.0.0"
+dbver="1.0.1"
 db = SQLite3::Database.open "../db/development.sqlite3"
 
 if "FONEFLARE"!=db.get_first_value("SELECT name FROM sqlite_master WHERE type='table' AND name='FONEFLARE'");
@@ -43,6 +43,12 @@ db.execute "create table if not exists FLARES (FLARE_ID INTEGER PRIMARY KEY,
 db.execute "create table if not exists CATEGORIES (CATEGORY_ID INTEGER PRIMARY KEY, 
 													DESCRIPTION TEXT)" 
 
+db.execute "insert into CATEGORIES (DESCRIPTION) values ('Missing Person')"
+db.execute "insert into CATEGORIES (DESCRIPTION) values ('Medical Assistance')"
+db.execute "insert into CATEGORIES (DESCRIPTION) values ('Stranded')"
+db.execute "insert into CATEGORIES (DESCRIPTION) values ('Property Damage')"
+db.execute "insert into CATEGORIES (DESCRIPTION) values ('Shelter')"
+													
 db.execute "create table if not exists RESPONDERS	(RESPONDER_ID INTEGER PRIMARY KEY,
 														SRCPHONE TEXT, 
 														CATEGORY INTEGER, 
