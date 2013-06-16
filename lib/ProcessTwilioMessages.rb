@@ -204,7 +204,7 @@ if rs.count > 0
 						@client.account.sms.messages.create(:body=>"Please enter a valid category number.", :to=>srcphone, :from=>twiliophone)
 					end
 				when "5"
-					fid=@db.get_first_value("select flare_id from FLARES where srcphone='"+srcphone+"' and active=4")
+					fid=@db.get_first_value("select flare_id from FLARES where srcphone='"+srcphone+"' and active=5")
 					@db.execute("update FLARES set description='"+message.body+"', active=1, updated_dt='"+Time.now.to_s()+"' where srcphone='"+srcphone+"' and active=5")
 					@client.account.sms.messages.create(:body=>"You have completed creating flare id F"+fid.to_s()+". Please record this responder id for future commands to FoneFlare." , :to=>srcphone, :from=>twiliophone)
 				else
