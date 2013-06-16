@@ -18,6 +18,8 @@ class FlareController < ApplicationController
   end
 
   def create
+    db = SQLite3::Database.open "db/development.sqlite3"
+    @categories = db.execute("SELECT * FROM CATEGORIES;")
   end
 
   def destroy
